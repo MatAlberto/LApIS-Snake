@@ -99,9 +99,9 @@ class NeuralNetwork
   {
     input = in;
     feedForward(input,hidden,inHdWeight);
-    activation(hidden,hiddenActivation);
+    activationSigmoid(hidden,hiddenActivation);
     feedForward(hiddenActivation,output,hdOutWeight);
-    activation(output,outputActivation);
+    activationSigmoid(output,outputActivation);
     outputActivationPrevious = outputActivation;
     int maxId=0;
     for(int i=1;i<output.length;i++)if(output[i]>output[maxId])maxId=i;
@@ -155,7 +155,7 @@ class NeuralNetwork
    for(int i=0;i<resp.length;i++)
    {
      for(int j=0;j<deltaErrorNextLayer.length;j++)sumError += weights[i][j]*deltaErrorNextLayer[j];
-     resp[i] = layerActivation[i]*(1-layerActivation[i])*sumError;
+     resp[i] = getSoftmaxDerivative(layerActivation[i])*sumError;
    }
     return resp;
   }
@@ -168,16 +168,30 @@ class NeuralNetwork
     return res;
   }
   
-  void activation(double[] layer, double[] layerActivation)
+  void activationSigmoid(double[] layer, double[] layerActivation)
   {
     for(int i=0;i<layerActivation.length;i++)
     {
       layerActivation[i] = 1/(1+Math.exp(-layer[i]));
-      //layerActivation[i] = Math.max(0,layer[i]);
-      //if(layer[i]>0)println(layer[i]);
     }
   }
   
+  double getSigmoidDerivative(double val)
+  {
+    return val*(1-val);
+  }
+  
+  void activationSoftmax(double[] layer, double[] layerActivation)
+  {
+    double sum=0;
+    for(int i=0;i<layerActivation.length;i++)sum += Math.exp(layer[i]);
+    for(int i=0;i<layerActivation.length;i++)layerActivation[i] = Math.exp(layer[i])/sum;
+  }
+  
+  double getSoftmaxDerivative(double val)
+  {
+    return val*(1-val);
+  }
   
   
 }
