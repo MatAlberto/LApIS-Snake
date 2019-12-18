@@ -37,7 +37,7 @@ class InputOutput
     double areaFront,areaLeft,areaRight;
     
     boolean[][] visited= new boolean[sizeTab][sizeTab];
-    for(int i=1;i<snake.length;i++)if(snake[i].x>=0 && snake[i].x<sizeTab && snake[i].y>=0 && snake[i].y<sizeTab)visited[snake[i].x][snake[i].y] = true;
+    for(int i=1;i<snake.length;i++)visited[snake[i].x][snake[i].y] = true;
     areaFront = getArea(head.x,head.y-1,visited.clone())/pow(sizeTab,2);
     areaLeft = getArea(head.x-1,head.y,visited.clone())/pow(sizeTab,2);
     areaRight = getArea(head.x+1,head.y,visited.clone())/pow(sizeTab,2);

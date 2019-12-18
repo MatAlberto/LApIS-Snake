@@ -97,13 +97,10 @@ class Snake
   
   void snakeDraw()
   {
-    float cor=105;
-    float size = score+3;
-    int i=0;
+    fill(0,255,0);
     Node n=tail;
     while(n != null)
     {
-      fill(0,150+((i++)*cor/size),0);
       rect(tab.initX+n.x*tab.sizeSquare,tab.initY+n.y*tab.sizeSquare,tab.sizeSquare,tab.sizeSquare);
       n= n.next;
     }
