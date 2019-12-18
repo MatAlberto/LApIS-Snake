@@ -17,14 +17,14 @@ class KNN
     m.put("LEFT",0);
     m.put("RIGHT",1);
     m.put("FRONT",2);
-    Set<Double> keys = sm.keySet();
-    int[] contOption = new int[3];
+
+    double[] contOption = new double[3];
     int aux=0;
     for(Double ke: sm.keySet())
     {
-      contOption[m.get(sm.get(ke).ladoVirado)]++;
+      contOption[m.get(sm.get(ke).ladoVirado)] -= ke ;
       aux++;
-      if(aux==k)break;
+      if(aux>=k)break;
     }
     if(contOption[0]>contOption[1])
     {

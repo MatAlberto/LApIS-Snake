@@ -104,7 +104,53 @@ class Snake
       rect(tab.initX+n.x*tab.sizeSquare,tab.initY+n.y*tab.sizeSquare,tab.sizeSquare,tab.sizeSquare);
       n= n.next;
     }
-      
+    
+    float eye1x = tab.initX+head.x*tab.sizeSquare;
+    float eye1y = tab.initY+head.y*tab.sizeSquare;
+    float eye2x = eye1x, eye2y = eye1y;
+    float mouthx= eye1x, mouthy = eye1y,mouthw=0,mouthh=0;
+    switch(dir)
+    {
+      case EAST:
+      eye1x = eye2x = eye1x+tab.sizeSquare*0.6;
+      eye1y += 0.2*tab.sizeSquare;
+      eye2y += 0.6*tab.sizeSquare;
+      mouthx += 0.85*tab.sizeSquare;
+      mouthy += 0.15*tab.sizeSquare;
+      mouthh = 0.7*tab.sizeSquare;
+      mouthw = 0.15*tab.sizeSquare;
+      break;
+      case WEST:
+      eye1x = eye2x = eye1x+tab.sizeSquare*0.2;
+      eye1y += 0.2*tab.sizeSquare;
+      eye2y += 0.6*tab.sizeSquare;
+      mouthh = 0.7*tab.sizeSquare;
+      mouthy += 0.15*tab.sizeSquare;
+      mouthw = 0.15*tab.sizeSquare;
+      break;
+      case NORTH:
+      eye1y = eye2y = eye1y+0.2*tab.sizeSquare;
+      eye1x += 0.2*tab.sizeSquare;
+      eye2x += 0.6*tab.sizeSquare;
+      mouthw = 0.7*tab.sizeSquare;
+      mouthx += 0.15*tab.sizeSquare;
+      mouthh = 0.15*tab.sizeSquare;
+      break;
+      case SOUTH:
+      eye1y = eye2y = eye1y+0.6*tab.sizeSquare;
+      eye1x += 0.2*tab.sizeSquare;
+      eye2x += 0.6*tab.sizeSquare;
+      mouthy += 0.85*tab.sizeSquare;
+      mouthw = 0.7*tab.sizeSquare;
+      mouthx += 0.15*tab.sizeSquare;
+      mouthh = 0.15*tab.sizeSquare;
+      break;
+    }
+    fill(0,0,255);
+    rect(eye1x,eye1y,0.2*tab.sizeSquare,0.2*tab.sizeSquare);
+    rect(eye2x,eye2y,0.2*tab.sizeSquare,0.2*tab.sizeSquare);
+    fill(255,0,0);
+    rect(mouthx,mouthy,mouthw,mouthh);
   }
   
   

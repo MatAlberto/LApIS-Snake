@@ -34,6 +34,14 @@ class InputOutput
     double gradFront = sqrt(pow(head.x-food.x,2)+pow(head.y-food.y-1,2))/sizeTab - distFood;
     double gradLeft = sqrt(pow(head.x-food.x+1,2)+pow(head.y-food.y,2))/sizeTab - distFood;
     double size = snake.length/sizeTab;
+    double areaFront,areaLeft,areaRight;
+    
+    boolean[][] visited= new boolean[sizeTab][sizeTab];
+    for(int i=1;i<snake.length;i++)visited[snake[i].x][snake[i].y] = true;
+    areaFront = getArea(head.x,head.y-1,visited.clone())/pow(sizeTab,2);
+    areaLeft = getArea(head.x-1,head.y,visited.clone())/pow(sizeTab,2);
+    areaRight = getArea(head.x+1,head.y,visited.clone())/pow(sizeTab,2);
+    
     
     for(int node=0;node<snake.length-1;node++)
     {
@@ -50,11 +58,25 @@ class InputOutput
     //if(foodInFront==0)distFrente = -distFrente;
     //if(foodInLeft==1)distEsq = -distDir;
     
-    inputs = new double[]{distFrente,distEsq, distFood,foodInLeft, foodInRight,foodInFront,gradFront,gradLeft,size,0};
+    inputs = new double[]{distFrente,distEsq, distFood,foodInLeft, foodInRight,foodInFront,gradFront,gradLeft,size,areaFront,areaLeft,areaRight,0};
     outputs = new double[]{dir==Snake.WEST?1:0,dir==Snake.EAST?1:0,dir==Snake.NORTH?1:0};
     if(outputs[0]==1)ladoVirado = "LEFT";
     else if(outputs[1]==1)ladoVirado = "RIGHT";
     else ladoVirado = "FRONT";
+  }
+  
+  
+  double getArea(int x,int y,boolean[][] visited)
+  {
+    if(x<0 || x>=visited.length || y<0 || y>=visited[0].length)return 0;
+    if(visited[x][y])return 0;
+    double cont=1;
+    visited[x][y] = true;
+    cont += getArea(x-1,y,visited);
+    cont += getArea(x+1,y,visited);
+    cont += getArea(x,y-1,visited);
+    cont += getArea(x,y+1,visited);
+    return cont;
   }
   
 }

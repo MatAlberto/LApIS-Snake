@@ -1,7 +1,7 @@
 class Tabuleiro
 {
   int initX=20,initY=20;
-  int rows=20,cols=20;
+  int rows=20,cols=rows;
   int sizeSquare=(width-2*initX)/rows;
   Random foodChooser = new Random();
   Node food;

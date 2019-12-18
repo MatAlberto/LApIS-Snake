@@ -28,6 +28,20 @@ class Jogada
   {
     frames.clear();
     for(String s:loadStrings(name))frames.add(s);
+    filterFrames();
+  }
+  
+  void filterFrames()
+  {
+    String[] parts = frames.get(frames.size()-1).split(";");
+    Node lastFood = new Node(parseInt(parts[2]),parseInt(parts[3]));
+    for(int i=frames.size()-1;i>=0;i--)
+    {
+      String[] parts2 = frames.get(i).split(";");
+      if(parseInt(parts2[2])==lastFood.x && parseInt(parts2[3])==lastFood.y)frames.remove(i);
+      else break;
+    }
+    
   }
   
   
