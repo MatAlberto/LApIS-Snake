@@ -45,13 +45,13 @@ class Jogada
   }
   
   
-  ArrayList<InputOutput> inOutNeuralNetwork()
+  ArrayList<InputOutputFront> inOutNeuralNetwork()
   {
-    ArrayList<InputOutput> resp = new ArrayList<InputOutput>();;
+    ArrayList<InputOutputFront> resp = new ArrayList<InputOutputFront>();;
     int sizeTab = int(frames.get(0));
     for(int i=1;i<frames.size();i++)
     {
-      resp.add(new InputOutput(sizeTab,frames.get(i)));
+      resp.add(new InputOutputFront(sizeTab,frames.get(i)));
     }
     return resp;
   }

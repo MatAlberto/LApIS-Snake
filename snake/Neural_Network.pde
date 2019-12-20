@@ -9,8 +9,9 @@ class NeuralNetwork
   double[] input,hidden,output;
   double[] hiddenActivation,outputActivation;
   double learningRate = 0.1;
+  double learningRateFinal = 0.0001;
   int epochs = 200;
-  double percentageValidation=0.1;
+  double percentageValidation=0.20;
   double[] outputActivationPrevious;
   Layer[] layers;
   
@@ -35,17 +36,26 @@ class NeuralNetwork
     layers[0].output = layers[0].inputSum = in;
     layers[0].feedForward();
     int maxId=0;
-    double[] output = layers[layers.length-1].output;
-    for(int i=1;i<output.length;i++)if(output[i]>output[maxId])maxId=i;
+    if(layers[layers.length-1].size>1)
+    {
+      double[] output = layers[layers.length-1].output;
+      for(int i=1;i<output.length;i++)if(output[i]>output[maxId])maxId=i;
+      return labelsOut[maxId];
+    }
+    else
+    {
+      if(layers[layers.length-1].output[0]>0.5)return labelsOut[0];
+      else return "NOT";
+    }
     
-    return labelsOut[maxId];
+    
   }
   
   void train(List<InputOutput> examples)
   {
     println(examples.size());
     HashMap<String,Integer> mapa = new HashMap<String,Integer>();
-    mapa.put("LEFT",0);mapa.put("RIGHT",1);mapa.put("FRONT",2);
+    for(int i=0;i<labelsOut.length;i++)mapa.put(labelsOut[i],i);
     
     Collections.shuffle(examples);
     ArrayList<InputOutput> training = new ArrayList<InputOutput>();
@@ -57,12 +67,12 @@ class NeuralNetwork
     
     for(int epoch=0;epoch<epochs;epoch++)
     {
-      int[][] tabConfusaoTraining = new int[3][3];
-      int[][] tabConfusaoValidation = new int[3][3];
+      int[][] tabConfusaoTraining = new int[labelsOut.length][labelsOut.length];
+      int[][] tabConfusaoValidation = new int[labelsOut.length][labelsOut.length];
       for(InputOutput ex: training)
       {
         String outNet = evaluate(ex.inputs);
-        layers[layers.length-1].backPropagation(ex.outputs,learningRate);
+        layers[layers.length-1].backPropagation(ex.outputs,(learningRate-learningRateFinal)/(epoch+1));
         tabConfusaoTraining[mapa.get(outNet)][mapa.get(ex.ladoVirado)]++;
         
       }
@@ -83,7 +93,7 @@ class NeuralNetwork
   {
     double sum=0;
     for(int[] i: tabConfusao)for(int j: i)sum+=j;
-    double acuracia = 100*float(tabConfusao[0][0]+tabConfusao[1][1]+tabConfusao[2][2])/sum;
+    double acuracia = 100*float(tabConfusao[0][0]+tabConfusao[1][1])/sum;
     return (""+acuracia).substring(0,min((""+acuracia).length(),5));
   }
   
