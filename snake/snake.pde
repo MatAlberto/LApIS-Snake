@@ -21,9 +21,9 @@ void setup()
   size(600, 600);
   frameRate(500);
   initialize();
-  network1 = new NeuralNetwork(13, 30, 3, new String[]{"LEFT", "RIGHT", "FRONT"});
-  networks = new NeuralNetwork[10];
-  for (int i=0; i<networks.length; i++)networks[i] = new NeuralNetwork(13, 30, 3, new String[]{"LEFT", "RIGHT", "FRONT"});
+  network1 = new NeuralNetwork(new int[]{16, 30, 30, 3}, new String[]{"LEFT", "RIGHT", "FRONT"});
+  //networks = new NeuralNetwork[10];
+  //for (int i=0; i<networks.length; i++)networks[i] = new NeuralNetwork(16, 30, 3, new String[]{"LEFT", "RIGHT", "FRONT"});
   if (!humanPlay)
   {
     File folder = new File(sketchPath("")+"/jogadas");
@@ -44,8 +44,6 @@ void setup()
     }
     int min = Math.min(Math.min(contEx[0], contEx[1]), contEx[2]);
     println("MIN EXAMPLES: "+min);
-    for (int i=0; i<1; i++)
-    {
       int[] cont = {contEx[0],contEx[1],contEx[2]};
       Collections.shuffle(l);
       ArrayList<InputOutput> a = new ArrayList<InputOutput>(l);
@@ -61,15 +59,15 @@ void setup()
           a.remove(j--);
         }
       }
-      networks[i].train(a);
-       knn = new KNN(min,a.toArray(new InputOutput[0]));
-    }
-    //algGen = new AlgGenetico(networks);
-    //algGen = new AlgGenetico(10,10,30,3);
-    //network1.inHdWeight = algGen.atual.inHdWeight;
-   // network1.hdOutWeight = algGen.atual.hdOutWeight;
+      network1.train(a);
+      //knn = new KNN(100,a.toArray(new InputOutput[0]));
    
-    network1 = networks[0];
+    //algGen = new AlgGenetico(networks);
+   // algGen = new AlgGenetico(10,10,30,3);
+   // network1.inHdWeight = algGen.atual.inHdWeight;
+    //network1.hdOutWeight = algGen.atual.hdOutWeight;
+   
+    //network1 = networks[0];
   }
 }
 
@@ -86,7 +84,7 @@ void draw()
       double aux = framesWithoutEating/(tab.rows*2-snake.score==0?1:tab.rows*2-snake.score);
       inputs[inputs.length-1] = 1/(1+Math.exp(-aux));
       
-      if(loopDetection(inputs))snake.moveRelative(knn.evaluate(inputs));//reset();
+      if(loopDetection(inputs))reset();
       else
       {
         String resp = network1.evaluate(inputs);

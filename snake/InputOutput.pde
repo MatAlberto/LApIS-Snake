@@ -27,6 +27,8 @@ class InputOutput
     double distFrente=1+head.y;
     double distEsq=1+head.x;
     double distDir=sizeTab-head.x;
+    double distEsqFrente = Math.min(distFrente,distEsq);
+    double distDirFrente = Math.min(distFrente,distDir);
     double distFood = sqrt(pow(head.x-food.x,2)+pow(head.y-food.y,2))/sizeTab;
     double foodInFront = head.y>food.y?1:0;
     double foodInLeft = head.x>food.x?1:0;
@@ -51,14 +53,19 @@ class InputOutput
         if(head.x > snake[node].x && head.x-snake[node].x<distEsq)distEsq = head.x-snake[node].x;
         if(head.x < snake[node].x && snake[node].x-head.x<distDir)distDir = snake[node].x-head.x;
       }
+      if(head.x-snake[node].x>0 && head.x-snake[node].x == head.y-snake[node].y && head.x-snake[node].x<distEsqFrente)distEsqFrente = head.x-snake[node].x;
+      if(head.y-snake[node].y>0 && -head.x+snake[node].x == head.y-snake[node].y && head.y-snake[node].y<distDirFrente)distDirFrente = head.y-snake[node].y;
     }
     distFrente /= sizeTab;
     distEsq /= sizeTab;
     distDir /= sizeTab;
+    distDirFrente /= sizeTab;
+    distEsqFrente /= sizeTab;
     //if(foodInFront==0)distFrente = -distFrente;
     //if(foodInLeft==1)distEsq = -distDir;
     
-    inputs = new double[]{distFrente,distEsq, distFood,foodInLeft, foodInRight,foodInFront,gradFront,gradLeft,size,areaFront,areaLeft,areaRight,0};
+    inputs = new double[]{distFrente, distEsq, distDir, distEsqFrente, distDirFrente, distFood,foodInLeft, foodInRight,foodInFront,gradFront,gradLeft,
+                          size,areaFront,areaLeft,areaRight,0};
     outputs = new double[]{dir==Snake.WEST?1:0,dir==Snake.EAST?1:0,dir==Snake.NORTH?1:0};
     if(outputs[0]==1)ladoVirado = "LEFT";
     else if(outputs[1]==1)ladoVirado = "RIGHT";

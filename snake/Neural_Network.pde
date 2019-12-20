@@ -9,25 +9,36 @@ class NeuralNetwork
   double[] input,hidden,output;
   double[] hiddenActivation,outputActivation;
   double learningRate = 0.1;
-  int epochs = 100;
-  double percentageValidation=0.5;
+  int epochs = 200;
+  double percentageValidation=0.1;
   double[] outputActivationPrevious;
+  Layer[] layers;
   
-  NeuralNetwork(int in, int hd, int out, String[] labels)
+  NeuralNetwork(int[] layerSizes,String[] labels)
   {
-    sizeInput = in;
-    sizeHidden = hd;
-    sizeOut = out;
-    inHdWeight = new double[in][hd];
-    hdOutWeight = new double[hd][out];
+    layers = new Layer[layerSizes.length];
+    for(int i=0;i<layerSizes.length;i++)layers[i] = new Layer(layerSizes[i]);
+    for(int i=1;i<layerSizes.length-1;i++)
+    {
+      layers[i].nextLayer = layers[i+1];
+      layers[i].previousLayer = layers[i-1];
+      layers[i].initWeights();
+    }
+    layers[0].nextLayer = layers[1];
+    layers[layers.length-1].previousLayer = layers[layers.length-2];
+    layers[0].initWeights();
     labelsOut = labels;
-    hidden = new double[hd];
-    output = new double[out];
-    hiddenActivation = new double[hd];
-    outputActivation = new double[out];
-    outputActivationPrevious = new double[out];
-    for(int i=0;i<outputActivationPrevious.length;i++)outputActivationPrevious[i] = 0.5;
-    setRandom();
+  }
+  
+  String evaluate(double[] in)
+  {
+    layers[0].output = layers[0].inputSum = in;
+    layers[0].feedForward();
+    int maxId=0;
+    double[] output = layers[layers.length-1].output;
+    for(int i=1;i<output.length;i++)if(output[i]>output[maxId])maxId=i;
+    
+    return labelsOut[maxId];
   }
   
   void train(List<InputOutput> examples)
@@ -51,7 +62,7 @@ class NeuralNetwork
       for(InputOutput ex: training)
       {
         String outNet = evaluate(ex.inputs);
-        backPropagation(ex.outputs);
+        layers[layers.length-1].backPropagation(ex.outputs,learningRate);
         tabConfusaoTraining[mapa.get(outNet)][mapa.get(ex.ladoVirado)]++;
         
       }
@@ -66,14 +77,6 @@ class NeuralNetwork
       Collections.shuffle(training);
       Collections.shuffle(validation);
     }
-  }
-  
-  void setRandom()
-  {
-    for(int i=0;i<inHdWeight.length;i++)for(int j=0;j<inHdWeight[i].length;j++)
-      inHdWeight[i][j] = random(-1,1);
-    for(int i=0;i<hdOutWeight.length;i++)for(int j=0;j<hdOutWeight[i].length;j++)
-      hdOutWeight[i][j] = random(-1,1);
   }
   
   String getAccuracy(int[][] tabConfusao)
@@ -93,91 +96,100 @@ class NeuralNetwork
       }
       println();
   }
+}
+
+
+class Layer
+{
+  int size;
+  double[] inputSum;
+  double[] output;
+  double[] deltaError;
+  double[][] weight;
+
+  Layer nextLayer=null,previousLayer=null;
   
-  
-  String evaluate(double[] in)
+  Layer (int sizeLayer)
   {
-    input = in;
-    feedForward(input,hidden,inHdWeight);
-    activation(hidden,hiddenActivation);
-    feedForward(hiddenActivation,output,hdOutWeight);
-    activation(output,outputActivation);
-    outputActivationPrevious = outputActivation;
-    int maxId=0;
-    for(int i=1;i<output.length;i++)if(output[i]>output[maxId])maxId=i;
-    
-    return labelsOut[maxId];
+    inputSum = new double[sizeLayer];
+    output = new double[sizeLayer];
+    deltaError = new double[sizeLayer];
+    size = sizeLayer;
   }
   
-  void feedForward(double[] layer1, double[] layer2, double[][] weights)
+  void initWeights()
   {
-    for(int i=0;i<layer2.length;i++)layer2[i] = 0;
-    for(int i=0;i<layer1.length;i++)
+    weight = new double[size+1][nextLayer.size];
+    for(int i=0;i<weight.length;i++)for(int j=0;j<weight[i].length;j++)
+      weight[i][j] = random(-1,1);
+  }
+  
+
+  
+  void activationSigmoid()
+  {
+    for(int i=0;i<output.length;i++)
     {
-      for(int j=0;j<layer2.length;j++)
+      output[i] = 1/(1+Math.exp(-inputSum[i]));
+    }
+  }
+  
+  void feedForward()
+  {
+    if(nextLayer==null)return;
+    for(int i=0;i<nextLayer.inputSum.length;i++)nextLayer.inputSum[i] = 0;
+    for(int i=0;i<output.length;i++)
+    {
+      for(int j=0;j<nextLayer.inputSum.length;j++)
       {
-         layer2[j] += layer1[i]*weights[i][j];
+         nextLayer.inputSum[j] += output[i]*weight[i][j];
       }
     }
-    
+    nextLayer.activationSigmoid();
+    nextLayer.feedForward();
   }
   
-  void backPropagation(double[] saidaEsp)
+  void backPropagation(double[] saidaEsp, double learningRate)
   {
-    double[] outputError = getError(output,saidaEsp);
-    double[] deltaErrorOutput =  getDeltaErrorOutput(outputActivation,outputError);
-    double[][] weightCorrectionHdOut = getWeightCorrection(hiddenActivation,deltaErrorOutput);
-    double[] deltaErrorHidden =  getDeltaError(hiddenActivation,hdOutWeight,deltaErrorOutput);
-    double[][] weightCorrectionInHd = getWeightCorrection(input,deltaErrorHidden);
-    for(int i=0;i<hdOutWeight.length;i++)for(int j=0;j<hdOutWeight[i].length;j++)hdOutWeight[i][j] += weightCorrectionHdOut[i][j];
-    for(int i=0;i<inHdWeight.length;i++)for(int j=0;j<inHdWeight[i].length;j++)inHdWeight[i][j] += weightCorrectionInHd[i][j];
+    if(nextLayer == null)
+    {
+      setDeltaErrorOutput(getError(saidaEsp));
+    }
+    else
+    {
+      setDeltaError();
+      setWeightCorrection(learningRate);
+    }
+    if(previousLayer != null)previousLayer.backPropagation(saidaEsp,learningRate);
   }
   
-  double[][] getWeightCorrection(double[] layerActivation, double[] deltaError)
-  {
-    double[][] resp = new double[layerActivation.length][deltaError.length];
-    for(int i=0;i<layerActivation.length;i++)for(int j=0;j<deltaError.length;j++)
-      resp[i][j] = (-learningRate)*layerActivation[i]*deltaError[j];
-    return resp;
-  }
-  
-  double[] getDeltaErrorOutput(double[] out, double[] error)
-  {
-    double[] resp = new double[out.length];
-    for(int i=0;i<out.length;i++) resp[i] = out[i]*(1-out[i])*error[i];
-    return resp;
-  }
-  
-  double[] getDeltaError(double[] layerActivation, double[][] weights, double[] deltaErrorNextLayer)
-  {
-   double[] resp = new double[layerActivation.length];   
-   double sumError=0;
-   for(int i=0;i<resp.length;i++)
-   {
-     for(int j=0;j<deltaErrorNextLayer.length;j++)sumError += weights[i][j]*deltaErrorNextLayer[j];
-     resp[i] = layerActivation[i]*(1-layerActivation[i])*sumError;
-   }
-    return resp;
-  }
-  
-  
-  double[] getError(double[] output, double[] expected)
+  double[] getError(double[] expected)
   {
     double[] res = new double[output.length];
     for(int i=0;i<output.length;i++)res[i] = (output[i] - expected[i]);
     return res;
   }
   
-  void activation(double[] layer, double[] layerActivation)
+  void setDeltaErrorOutput(double[] error)
   {
-    for(int i=0;i<layerActivation.length;i++)
-    {
-      layerActivation[i] = 1/(1+Math.exp(-layer[i]));
-      //layerActivation[i] = Math.max(0,layer[i]);
-      //if(layer[i]>0)println(layer[i]);
-    }
+    for(int i=0;i<deltaError.length;i++) deltaError[i] = output[i]*(1-output[i])*error[i];
   }
   
+  void setDeltaError()
+  {
+   double sumError=0;
+   for(int i=0;i<deltaError.length;i++)
+   {
+     for(int j=0;j<nextLayer.deltaError.length;j++)sumError += weight[i][j]*nextLayer.deltaError[j];
+     deltaError[i] = output[i]*(1-output[i])*sumError;
+   }
+  }
+  
+  void setWeightCorrection(double learningRate)
+  {
+    for(int i=0;i<output.length;i++)for(int j=0;j<nextLayer.deltaError.length;j++)
+      weight[i][j] += (-learningRate)*output[i]*nextLayer.deltaError[j];
+  }
   
   
 }
