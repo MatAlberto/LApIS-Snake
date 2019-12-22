@@ -21,7 +21,7 @@ void setup()
   size(600, 600);
   frameRate(500);
   initialize();
-  
+  network1 = new NeuralNetwork(new int[]{16, 30, 30, 3}, new String[]{"LEFT", "RIGHT", "FRONT"});
   //networks = new NeuralNetwork[10];
   //for (int i=0; i<networks.length; i++)networks[i] = new NeuralNetwork(16, 30, 3, new String[]{"LEFT", "RIGHT", "FRONT"});
   if (!humanPlay)
@@ -50,18 +50,17 @@ void setup()
       for (int j=0; j<a.size(); j++)
       {
         int lado = -1;
-        if (a.get(j).ladoVirado.equals("FRONT"))lado = 0;
-        else lado = 1;
+        if (a.get(j).ladoVirado.equals("LEFT"))lado = 0;
+        if (a.get(j).ladoVirado.equals("FRONT"))lado = 1;
+        if (a.get(j).ladoVirado.equals("RIGHT"))lado = 2;
         if (cont[lado] >min)
         {
           cont[lado]--;
           a.remove(j--);
         }
       }
-      //knn = new KNN(min,a.toArray(new InputOutput[0]));      
-      network1 = new NeuralNetwork(new int[]{l.get(0).inputs.length, 30,10, 2}, new String[]{"FRONT", "NOT"});
       network1.train(a);
-      
+      //knn = new KNN(100,a.toArray(new InputOutput[0]));
    
     //algGen = new AlgGenetico(networks);
    // algGen = new AlgGenetico(10,10,30,3);
@@ -83,11 +82,13 @@ void draw()
     {
       double[] inputs = new InputOutput(tab.rows, getInput()).inputs;
       double aux = framesWithoutEating/(tab.rows*2-snake.score==0?1:tab.rows*2-snake.score);
+      inputs[inputs.length-1] = 1/(1+Math.exp(-aux));
       
       if(loopDetection(inputs))reset();
       else
       {
-        snake.moveRelative(network1.evaluate(inputs));
+        String resp = network1.evaluate(inputs);
+        snake.moveRelative(resp);
       }
     }
     if (snake.isDead && humanPlay)currentPlay.saveData();

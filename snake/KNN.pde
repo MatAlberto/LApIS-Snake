@@ -43,10 +43,7 @@ class KNN
     return Math.sqrt(dist);
   }
   
-  
-}
-
-double similarityCosineKNN(double[] in1, double[] in2)
+  double similarityCosineKNN(double[] in1, double[] in2)
   {
     double sum1=0,sum2=0,sumProduct=0;
     for(int i =0;i<in1.length;i++)
@@ -57,3 +54,5 @@ double similarityCosineKNN(double[] in1, double[] in2)
     }
     return sumProduct/(Math.sqrt(sum1)*Math.sqrt(sum2));
   }
+  
+}

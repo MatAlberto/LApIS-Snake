@@ -64,13 +64,8 @@ class InputOutput
     //if(foodInFront==0)distFrente = -distFrente;
     //if(foodInLeft==1)distEsq = -distDir;
     
-    
-    
     inputs = new double[]{distFrente, distEsq, distDir, distEsqFrente, distDirFrente, distFood,foodInLeft, foodInRight,foodInFront,gradFront,gradLeft,
-                          size,areaFront,areaLeft,areaRight};
-                          
-                          
-                          
+                          size,areaFront,areaLeft,areaRight,0};
     outputs = new double[]{dir==Snake.WEST?1:0,dir==Snake.EAST?1:0,dir==Snake.NORTH?1:0};
     if(outputs[0]==1)ladoVirado = "LEFT";
     else if(outputs[1]==1)ladoVirado = "RIGHT";
@@ -91,22 +86,4 @@ class InputOutput
     return cont;
   }
   
-}
-
-class InputOutputFront extends InputOutput
-{
-  InputOutputFront(int sizeTab, String frame)
-  {
-    super(sizeTab, frame);
-    if(!ladoVirado.equals("FRONT"))ladoVirado = "NOT";
-  }
-}
-
-class InputOutputLeft extends InputOutput
-{
-  InputOutputLeft(int sizeTab, String frame)
-  {
-    super(sizeTab, frame);
-    if(!ladoVirado.equals("LEFT"))ladoVirado = "NOT";
-  }
 }
