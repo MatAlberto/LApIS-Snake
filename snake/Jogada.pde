@@ -20,7 +20,7 @@ class Jogada
   
   void saveData()
   {
-    String name = new SimpleDateFormat("dd-MM-yyyy-HH-mm-ss'.txt'").format(new Date());
+    String name = (!humanPlay?"IA_":"")+new SimpleDateFormat("dd-MM-yyyy-HH-mm-ss'.txt'").format(new Date());
     saveStrings("./jogadas/"+name,frames.toArray(new String[0]));
   }
   

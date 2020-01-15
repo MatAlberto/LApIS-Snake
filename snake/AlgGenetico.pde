@@ -22,7 +22,7 @@ class AlgGenetico
     population = new Individuo[networks.length];
     for(int i=0;i<population.length;i++)
     {
-      population[i] = new Individuo(networks[i].inHdWeight,networks[i].hdOutWeight);
+      //population[i] = new Individuo(networks[i].inHdWeight,networks[i].hdOutWeight);
     }
     atual = population[0];
   }

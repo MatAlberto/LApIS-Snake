@@ -6,6 +6,7 @@ class Snake
   int dir;
   int score = 0;
   boolean isDead=false;
+  boolean isActive=true;
   
   Snake(int x, int y, int l)
   {
@@ -20,6 +21,8 @@ class Snake
     tail = aux;
     head.next = null;
   }
+  
+  Snake(){}
   
   void move(int dir)
   {
@@ -45,8 +48,12 @@ class Snake
        head.x--;
     }
     this.dir = dir;
+   
     deathCheck();
-    eatCheck();
+    if(isActive)
+    {
+      eatCheck();
+    }
   }
   
   void moveRelative(String d)
@@ -93,6 +100,24 @@ class Snake
     Node n = new Node(tail.x,tail.y);
     n.next = tail;
     tail = n;
+  }
+  
+  Snake cloneSnake()
+  {
+    Snake nova = new Snake();
+    Node auxOriginal = tail;
+    nova.tail = new Node(tail.x,tail.y);
+    Node auxNew = nova.tail;
+    while(auxOriginal.next != null)
+    {
+      auxOriginal = auxOriginal.next;
+      auxNew.next = new Node(auxOriginal.x,auxOriginal.y);
+      auxNew = auxNew.next;
+    }
+    nova.head = auxNew;
+    nova.head.next = null;
+    nova.dir = dir;
+    return nova;
   }
   
   void snakeDraw()

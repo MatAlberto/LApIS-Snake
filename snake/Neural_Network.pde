@@ -3,14 +3,11 @@ class NeuralNetwork
   int sizeInput;
   int sizeHidden;
   int sizeOut;
-  double[][] inHdWeight;
-  double[][] hdOutWeight;
   String[] labelsOut;
-  double[] input,hidden,output;
-  double[] hiddenActivation,outputActivation;
-  double learningRate = 0.1;
-  int epochs = 200;
-  double percentageValidation=0.1;
+  double[] output;
+  double learningRate = 1;
+  int epochs = 300;
+  double percentageValidation=0.21;
   double[] outputActivationPrevious;
   Layer[] layers;
   
@@ -27,6 +24,7 @@ class NeuralNetwork
     layers[0].nextLayer = layers[1];
     layers[layers.length-1].previousLayer = layers[layers.length-2];
     layers[0].initWeights();
+    output = new double[layerSizes[layerSizes.length-1]];
     labelsOut = labels;
   }
   
@@ -35,7 +33,7 @@ class NeuralNetwork
     layers[0].output = layers[0].inputSum = in;
     layers[0].feedForward();
     int maxId=0;
-    double[] output = layers[layers.length-1].output;
+    output = layers[layers.length-1].output;
     for(int i=1;i<output.length;i++)if(output[i]>output[maxId])maxId=i;
     
     return labelsOut[maxId];
@@ -44,6 +42,7 @@ class NeuralNetwork
   void train(List<InputOutput> examples)
   {
     println(examples.size());
+    double previousAcc = 0;
     HashMap<String,Integer> mapa = new HashMap<String,Integer>();
     mapa.put("LEFT",0);mapa.put("RIGHT",1);mapa.put("FRONT",2);
     
@@ -76,6 +75,7 @@ class NeuralNetwork
       //printTabConfusao(tabConfusaoValidation);
       Collections.shuffle(training);
       Collections.shuffle(validation);
+      learningRate = 1/(float(epoch)+1);
     }
   }
   

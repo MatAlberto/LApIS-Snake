@@ -15,6 +15,7 @@ long seedFood = new Random().nextLong();
 ArrayList<double[]> previousInputs;
 KNN knn;
 boolean humanPlay = false;
+boolean saveAIGames = false;
 
 void setup()
 {
@@ -80,18 +81,40 @@ void draw()
     if (humanPlay)snake.move(dir);
     else 
     {
-      double[] inputs = new InputOutput(tab.rows, getInput()).inputs;
+      double[] inputs = new InputOutput(tab.rows, getInput(snake)).inputs;
       double aux = framesWithoutEating/(tab.rows*2-snake.score==0?1:tab.rows*2-snake.score);
       inputs[inputs.length-1] = 1/(1+Math.exp(-aux));
       
-      if(loopDetection(inputs))reset();
+      if(loopDetection(inputs))
+      {
+        println("Reseted by loop detection");
+        reset();
+      }
       else
       {
-        String resp = network1.evaluate(inputs);
-        snake.moveRelative(resp);
+        String respOriginal = network1.evaluate(inputs);
+        String[] options = {"LEFT","RIGHT","FRONT"};
+        double[] optionsValues = {network1.output[0],network1.output[1],network1.output[2]};
+        int maxID = 0;
+        for(int i=0;i<3;i++)
+        {
+          Snake clone = snake.cloneSnake();
+          clone.isActive = false;
+          clone.moveRelative(options[i]);
+          if(clone.isDead)optionsValues[i]=0;
+          else
+          {
+            network1.evaluate(new InputOutput(tab.rows, getInput(clone)).inputs);
+            optionsValues[i] *= Math.max(Math.max(network1.output[0],network1.output[1]),network1.output[2]);
+          }
+        }
+        for(int i=0;i<3;i++)if(optionsValues[i] > optionsValues[maxID])maxID = i;
+        
+        snake.moveRelative(options[maxID]);
+        if(!respOriginal.equals(options[maxID]))println("original:" + respOriginal + " combinado: " + options[maxID]);
       }
     }
-    if (snake.isDead && humanPlay)currentPlay.saveData();
+    if (snake.isDead && (humanPlay || saveAIGames))currentPlay.saveData();
   }
 
   background(0);
@@ -150,8 +173,8 @@ void resetAlgGen()
 {
   algGen.atual.fitness = snake.score+1;
   algGen.setNextIndividuo();
-  network1.inHdWeight = algGen.atual.inHdWeight;
-  network1.hdOutWeight = algGen.atual.hdOutWeight;
+  //network1.inHdWeight = algGen.atual.inHdWeight;
+  //network1.hdOutWeight = algGen.atual.hdOutWeight;
 }
 
 void keyPressed()
@@ -166,10 +189,10 @@ void keyPressed()
   if (key == 'l') moveDelay += 5;
 }
 
-String getInput()
+String getInput(Snake sna)
 {
-  String s = 0+";"+snake.dir+";"+tab.food.x+";"+tab.food.y;
-  Node n = snake.tail;
+  String s = 0+";"+sna.dir+";"+tab.food.x+";"+tab.food.y;
+  Node n = sna.tail;
   while (n != null)
   {
     s += ";"+n.x+";"+n.y+"";
