@@ -126,6 +126,7 @@ class Snake
     Node n=tail;
     while(n != null)
     {
+      if(n.next != null)if(n.next.next == null)fill(0,200,0);
       rect(tab.initX+n.x*tab.sizeSquare,tab.initY+n.y*tab.sizeSquare,tab.sizeSquare,tab.sizeSquare);
       n= n.next;
     }

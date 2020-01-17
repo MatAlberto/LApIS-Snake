@@ -16,13 +16,14 @@ ArrayList<double[]> previousInputs;
 KNN knn;
 boolean humanPlay = false;
 boolean saveAIGames = false;
+String respOriginal="",respRecu="";
 
 void setup()
 {
   size(600, 600);
   frameRate(500);
   initialize();
-  network1 = new NeuralNetwork(new int[]{16, 30, 30, 3}, new String[]{"LEFT", "RIGHT", "FRONT"});
+  network1 = new NeuralNetwork(new int[]{16, 30, 3}, new String[]{"LEFT", "RIGHT", "FRONT"});
   //networks = new NeuralNetwork[10];
   //for (int i=0; i<networks.length; i++)networks[i] = new NeuralNetwork(16, 30, 3, new String[]{"LEFT", "RIGHT", "FRONT"});
   if (!humanPlay)
@@ -74,6 +75,7 @@ void setup()
 
 void draw()
 {
+  background(0);
   if (millis()-before>moveDelay && !snake.isDead && pause)
   {
     before = millis();
@@ -92,37 +94,29 @@ void draw()
       }
       else
       {
-        String respOriginal = network1.evaluate(inputs);
+        respOriginal = network1.evaluate(inputs);
         String[] options = {"LEFT","RIGHT","FRONT"};
-        double[] optionsValues = {network1.output[0],network1.output[1],network1.output[2]};
-        int maxID = 0;
-        for(int i=0;i<3;i++)
-        {
-          Snake clone = snake.cloneSnake();
-          clone.isActive = false;
-          clone.moveRelative(options[i]);
-          if(clone.isDead)optionsValues[i]=0;
-          else
-          {
-            network1.evaluate(new InputOutput(tab.rows, getInput(clone)).inputs);
-            optionsValues[i] *= Math.max(Math.max(network1.output[0],network1.output[1]),network1.output[2]);
-          }
-        }
-        for(int i=0;i<3;i++)if(optionsValues[i] > optionsValues[maxID])maxID = i;
         
+        double[] optionsValues = evaluateRecursive(snake,5,inputs,options);
+        int maxID = 0;
+        for(int i=0;i<3;i++)if(optionsValues[i] > optionsValues[maxID])maxID = i;
         snake.moveRelative(options[maxID]);
-        if(!respOriginal.equals(options[maxID]))println("original:" + respOriginal + " combinado: " + options[maxID]);
+        respRecu = options[maxID];
+        if(optionsValues[0] + optionsValues[1] + optionsValues[2] == 0)noLoop();
+        //if(!respOriginal.equals(options[maxID]))println("original:" + respOriginal + " combinado: " + options[maxID]);
       }
     }
     if (snake.isDead && (humanPlay || saveAIGames))currentPlay.saveData();
   }
 
-  background(0);
+ 
   snake.snakeDraw();
   tab.tabDraw();
   textSize(15);
   text("Score: "+snake.score, 10, 15);
   text("Max Score: "+maxScore, 100, 15);
+  text("Resp_or: "+respOriginal, 210, 15);
+  text("Resp_re: "+respRecu, 410, 15);
   String tx="";
   //tx += "P(FRONT): "+(""+100*network1.outputActivation[2]).substring(0, min((""+network1.outputActivation[2]).length(), 5));
   //tx+= "\t P(LEFT): "+(""+100*network1.outputActivation[0]).substring(0, min((""+network1.outputActivation[0]).length(), 5));
@@ -139,13 +133,10 @@ void draw()
   text(tx, 220, 15);
   if (snake.isDead)
   {
-    background(255, 0, 0);
+    //background(255, 0, 0);
+    println("snake is dead");
+    noLoop();
     if (!humanPlay)reset();
-  }
-  if (!humanPlay && framesWithoutEating > maxFramesWithoutEating)
-  {
-    framesWithoutEating = 0;
-    reset();
   }
   //println(dir);
 }
@@ -187,6 +178,7 @@ void keyPressed()
   if (key == 'p') pause = !pause;
   if (key == 'k') moveDelay = Math.max(1, moveDelay-5);
   if (key == 'l') moveDelay += 5;
+  if (key == 'm') loop();
 }
 
 String getInput(Snake sna)
@@ -219,4 +211,28 @@ boolean loopDetection(double[] inputs)
   }
   previousInputs.add(inputs);
   return false;
+}
+
+
+
+double[] evaluateRecursive(Snake sn, int futureDecisionNumber, double[] inputs, String[] options)
+{
+  network1.evaluate(inputs);
+  double[] optionsValues = {network1.output[0],network1.output[1],network1.output[2]};
+  if(futureDecisionNumber>0)
+  {
+    for(int i=0;i<options.length;i++)
+    {
+       Snake clone = sn.cloneSnake();
+       clone.isActive = false;
+       clone.moveRelative(options[i]);
+       if(clone.isDead)optionsValues[i]=0;
+       else
+       {
+         double[] nextIteration = evaluateRecursive(clone,futureDecisionNumber-1,new InputOutput(tab.rows, getInput(clone)).inputs,options);
+         optionsValues[i] *= Math.max(Math.max(nextIteration[0],nextIteration[1]),nextIteration[2]);
+       }
+     }
+  }
+   return optionsValues;
 }
