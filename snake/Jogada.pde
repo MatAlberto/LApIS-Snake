@@ -1,6 +1,8 @@
 import java.text.*;
 import java.util.*;
 
+boolean loadAIGames = false;
+
 class Jogada
 {
   ArrayList<String> frames = new ArrayList<String>(Arrays.asList(new String[]{tab.rows+""}));
@@ -26,6 +28,7 @@ class Jogada
   
   void loadData(String name)
   {
+    if(name.contains("IA_") && !loadAIGames) return;
     frames.clear();
     for(String s:loadStrings(name))frames.add(s);
     filterFrames();

@@ -15,7 +15,8 @@ long seedFood = new Random().nextLong();
 ArrayList<double[]> previousInputs;
 KNN knn;
 boolean humanPlay = false;
-boolean saveAIGames = false;
+boolean saveAIGames = true;
+boolean pauseWhenDie = false;
 String respOriginal="",respRecu="";
 
 void setup()
@@ -23,7 +24,7 @@ void setup()
   size(600, 600);
   frameRate(500);
   initialize();
-  network1 = new NeuralNetwork(new int[]{16, 30, 3}, new String[]{"LEFT", "RIGHT", "FRONT"});
+  network1 = new NeuralNetwork(new int[]{15, 30, 3}, new String[]{"LEFT", "RIGHT", "FRONT"});
   //networks = new NeuralNetwork[10];
   //for (int i=0; i<networks.length; i++)networks[i] = new NeuralNetwork(16, 30, 3, new String[]{"LEFT", "RIGHT", "FRONT"});
   if (!humanPlay)
@@ -97,12 +98,12 @@ void draw()
         respOriginal = network1.evaluate(inputs);
         String[] options = {"LEFT","RIGHT","FRONT"};
         
-        double[] optionsValues = evaluateRecursive(snake,3,inputs,options);
+        double[] optionsValues = evaluateRecursive(snake,6,inputs,options);
         int maxID = 0;
         for(int i=0;i<3;i++)if(optionsValues[i] > optionsValues[maxID])maxID = i;
         snake.moveRelative(options[maxID]);
         respRecu = options[maxID];
-        if(optionsValues[0] + optionsValues[1] + optionsValues[2] == 0)noLoop();
+        if(optionsValues[0] + optionsValues[1] + optionsValues[2] == 0 && pauseWhenDie)noLoop();
         //if(!respOriginal.equals(options[maxID]))println("original:" + respOriginal + " combinado: " + options[maxID]);
       }
     }
@@ -135,8 +136,12 @@ void draw()
   {
     //background(255, 0, 0);
     println("snake is dead");
-    noLoop();
-    if (!humanPlay)reset();
+    
+    if (!humanPlay)
+    {
+      if(pauseWhenDie)noLoop();
+      reset();
+    }
   }
   //println(dir);
 }
