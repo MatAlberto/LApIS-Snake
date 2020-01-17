@@ -97,7 +97,7 @@ void draw()
         respOriginal = network1.evaluate(inputs);
         String[] options = {"LEFT","RIGHT","FRONT"};
         
-        double[] optionsValues = evaluateRecursive(snake,5,inputs,options);
+        double[] optionsValues = evaluateRecursive(snake,3,inputs,options);
         int maxID = 0;
         for(int i=0;i<3;i++)if(optionsValues[i] > optionsValues[maxID])maxID = i;
         snake.moveRelative(options[maxID]);
