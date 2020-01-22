@@ -64,8 +64,10 @@ class InputOutput
     //if(foodInFront==0)distFrente = -distFrente;
     //if(foodInLeft==1)distEsq = -distDir;
     
-    inputs = new double[]{distFrente, distEsq, distDir, distEsqFrente, distDirFrente, distFood,foodInLeft, foodInRight,foodInFront,gradFront,gradLeft,
-                          size,areaFront,areaLeft,areaRight};
+    inputs = new double[]{distFrente, distEsq, distDir, distEsqFrente, distDirFrente, distFood,
+                          foodInLeft, foodInRight,foodInFront, gradFront, gradLeft, size,areaFront,
+                          areaLeft, areaRight};
+    
     outputs = new double[]{dir==Snake.WEST?1:0,dir==Snake.EAST?1:0,dir==Snake.NORTH?1:0};
     if(outputs[0]==1)ladoVirado = "LEFT";
     else if(outputs[1]==1)ladoVirado = "RIGHT";

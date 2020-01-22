@@ -24,7 +24,7 @@ void setup()
   size(600, 600);
   frameRate(500);
   initialize();
-  network1 = new NeuralNetwork(new int[]{15, 30, 3}, new String[]{"LEFT", "RIGHT", "FRONT"});
+  network1 = new NeuralNetwork(new int[]{15, 10, 3}, new String[]{"LEFT", "RIGHT", "FRONT"});
   //networks = new NeuralNetwork[10];
   //for (int i=0; i<networks.length; i++)networks[i] = new NeuralNetwork(16, 30, 3, new String[]{"LEFT", "RIGHT", "FRONT"});
   if (!humanPlay)
@@ -63,7 +63,7 @@ void setup()
         }
       }
       network1.train(a);
-      //knn = new KNN(100,a.toArray(new InputOutput[0]));
+      //knn = new KNN(1000,l.toArray(new InputOutput[0]));
    
     //algGen = new AlgGenetico(networks);
    // algGen = new AlgGenetico(10,10,30,3);
