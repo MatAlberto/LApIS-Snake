@@ -6,9 +6,11 @@ class NeuralNetwork
   String[] labelsOut;
   double[] output;
   double learningRate = 1;
-  int epochs = 200;
+  int epochs = 2000;
   double percentageValidation=0.10;
   double[] outputActivationPrevious;
+  double bestAccuracy=0;
+  int numberTurnsSameAccuracy=0;
   Layer[] layers;
   
   NeuralNetwork(int[] layerSizes,String[] labels)
@@ -70,6 +72,25 @@ class NeuralNetwork
         String outNet = evaluate(ex.inputs);
         tabConfusaoValidation[mapa.get(outNet)][mapa.get(ex.ladoVirado)]++;
       }
+      double acc = Double.parseDouble(getAccuracy(tabConfusaoValidation));
+      /*
+      if(acc>bestAccuracy)
+      {
+        bestAccuracy = acc;
+        numberTurnsSameAccuracy = 0;
+      }
+      else if(numberTurnsSameAccuracy++ >= epochs/10)
+      {
+        for(Layer l : layers)
+        {
+          if(l.weight == null)continue;
+          for(int j=0;j<l.weight.length;j++)for(int k=0;k<l.weight[j].length;k++)
+            l.weight[j][k] += learningRate*random(-1,1);
+        }
+        bestAccuracy=0;
+        numberTurnsSameAccuracy = 0;
+      }*/
+      
       println("EPOCH: "+epoch+" ACURACIA TRAINING: " + getAccuracy(tabConfusaoTraining) + " ACURACIA VALIDATION: "+getAccuracy(tabConfusaoValidation));
       //printTabConfusao(tabConfusaoTraining);
       //printTabConfusao(tabConfusaoValidation);
