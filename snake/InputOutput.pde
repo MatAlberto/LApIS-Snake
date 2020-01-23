@@ -38,6 +38,12 @@ class InputOutput
     double size = snake.length/sizeTab;
     double areaFront,areaLeft,areaRight;
     
+    double[] d = getRealDistancesFood(food, head, snake);
+    
+    double distRealFoodLeft=d[0], distRealFoodRight=d[1], distRealFoodFront=d[2];
+    
+    
+    
     boolean[][] visited= new boolean[sizeTab][sizeTab];
     for(int i=1;i<snake.length;i++)visited[snake[i].x][snake[i].y] = true;
     areaFront = getArea(head.x,head.y-1,visited.clone())/pow(sizeTab,2);
@@ -87,5 +93,18 @@ class InputOutput
     cont += getArea(x,y+1,visited);
     return cont;
   }
+  
+  double[] getRealDistancesFood(Node food, Node head, Node[] snake)
+  {
+    double[] resp = new double[3];
+    getRealDistancesFoodRecursive(0,resp,food,head,snake);
+    return resp;
+  }
+  
+  void getRealDistancesFoodRecursive(double dist, double[] resp, Node position, Node head, Node[] snake)
+  {
+    
+  }
+
   
 }
