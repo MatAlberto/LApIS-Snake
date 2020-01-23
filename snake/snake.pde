@@ -90,8 +90,8 @@ void draw()
       
       if(loopDetection(inputs))
       {
-        println("Reseted by loop detection");
-        reset();
+        //println("Reseted by loop detection");
+        //reset();
       }
       else
       {
@@ -116,7 +116,7 @@ void draw()
   textSize(15);
   text("Score: "+snake.score, 10, 15);
   text("Max Score: "+maxScore, 100, 15);
-  text("Resp_or: "+respOriginal, 210, 15);
+  text("Resp_or: "+respOriginal, 220, 15);
   text("Resp_re: "+respRecu, 410, 15);
   String tx="";
   //tx += "P(FRONT): "+(""+100*network1.outputActivation[2]).substring(0, min((""+network1.outputActivation[2]).length(), 5));

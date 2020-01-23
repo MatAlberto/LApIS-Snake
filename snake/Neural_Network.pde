@@ -6,7 +6,7 @@ class NeuralNetwork
   String[] labelsOut;
   double[] output;
   double learningRate = 1;
-  int epochs = 2000;
+  int epochs = 200;
   double percentageValidation=0.10;
   double[] outputActivationPrevious;
   double bestAccuracy=0;
