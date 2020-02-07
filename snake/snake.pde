@@ -24,7 +24,7 @@ void setup()
   size(600, 600);
   frameRate(500);
   initialize();
-  network1 = new NeuralNetwork(new int[]{15, 30, 3}, new String[]{"LEFT", "RIGHT", "FRONT"});
+  network1 = new NeuralNetwork(new int[]{15, 50, 50,50, 3}, new String[]{"LEFT", "RIGHT", "FRONT"});
   //networks = new NeuralNetwork[10];
   //for (int i=0; i<networks.length; i++)networks[i] = new NeuralNetwork(16, 30, 3, new String[]{"LEFT", "RIGHT", "FRONT"});
   if (!humanPlay)
@@ -103,7 +103,7 @@ void draw()
         for(int i=0;i<3;i++)if(optionsValues[i] > optionsValues[maxID])maxID = i;
         snake.moveRelative(options[maxID]);
         respRecu = options[maxID];
-        if(optionsValues[0] + optionsValues[1] + optionsValues[2] == 0 && pauseWhenDie)noLoop();
+        //if(optionsValues[0] + optionsValues[1] + optionsValues[2] == 0 && pauseWhenDie)noLoop();
         //if(!respOriginal.equals(options[maxID]))println("original:" + respOriginal + " combinado: " + options[maxID]);
       }
     }

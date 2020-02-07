@@ -39,9 +39,7 @@ class InputOutput
     double areaFront,areaLeft,areaRight;
     
     double[] d = getRealDistancesFood(food, head, snake);
-    
-    double distRealFoodLeft=d[0], distRealFoodRight=d[1], distRealFoodFront=d[2];
-    
+        
     
     
     boolean[][] visited= new boolean[sizeTab][sizeTab];
@@ -67,8 +65,8 @@ class InputOutput
     distDir /= sizeTab;
     distDirFrente /= sizeTab;
     distEsqFrente /= sizeTab;
-    //if(foodInFront==0)distFrente = -distFrente;
-    //if(foodInLeft==1)distEsq = -distDir;
+    if(foodInFront==0)distFrente = -distFrente;
+    if(foodInLeft==1)distEsq = -distDir;
     
     inputs = new double[]{distFrente, distEsq, distDir, distEsqFrente, distDirFrente, distFood,
                           foodInLeft, foodInRight,foodInFront, gradFront, gradLeft, size,areaFront,
